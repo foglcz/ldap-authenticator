@@ -1,0 +1,24 @@
+{
+    "name": "foglcz/ldap-authenticator",
+    "description": "LDAP Authenticator plugin for Nette Framework",
+    "keywords": ["nette", "auth", "authenticator", "ldap"],
+    "homepage": "http://github.com/foglcz/ldap-authenticator",
+    "license": ["LGPL"],
+    "authors":[
+        {
+            "name": "Pavel Ptáček",
+            "homepage": "http://animalgroup.cz"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/foglcz/ldap-authenticator/issues"
+    },
+    "require":{
+        "php": ">=5.3.2",
+        "nette/nette": "~2.1.0",
+        "tiesa/ldap": "dev-master"
+    },
+    "autoload": {
+        "classmap": ["lib/"]
+    }
+}
