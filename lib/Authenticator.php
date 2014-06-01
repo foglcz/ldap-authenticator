@@ -149,7 +149,7 @@ class Authenticator extends Object implements IAuthenticator
     public function authenticate(array $credentials)
     {
         list($username, $password) = $credentials;
-        echo $username = call_user_func_array($this->usernameGenerator, array($this->ldap, $username));
+        $username = call_user_func_array($this->usernameGenerator, array($this->ldap, $username));
 
         // Auth
         try {
