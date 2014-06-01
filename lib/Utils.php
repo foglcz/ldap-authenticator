@@ -6,6 +6,7 @@
  * @author Pavel Ptacek
  */
 namespace foglcz\LDAP;
+use foglcz\LDAP\Success\BaseHandler;
 
 /**
  * Utilities used throughout the package
@@ -35,4 +36,28 @@ class Utils
 
         return $name;
     }
+
+	/**
+	 * Get full user lookup string
+	 *
+	 * @param string $username
+	 * @return string
+	 */
+	public static function getUserLookup($username)
+	{
+		$search = array(':upn:', ':username:');
+		$replace = array($username);
+
+		// Post-process username: remove "domain\" and "@upn" parts
+		if(strpos($username, '\\') !== false) {
+			$username = substr($username, strpos($username, '\\') + 1);
+		}
+		if(strpos($username, '@') !== false) {
+			$username = substr($username, 0, strpos($username, '@'));
+		}
+
+		$replace[] = $username;
+
+		return str_replace($search, $replace, BaseHandler::$UserLookup);
+	}
 }

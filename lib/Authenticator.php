@@ -149,12 +149,12 @@ class Authenticator extends Object implements IAuthenticator
     public function authenticate(array $credentials)
     {
         list($username, $password) = $credentials;
-        $username = call_user_func_array($this->usernameGenerator, array($this->ldap, $username));
+        echo $username = call_user_func_array($this->usernameGenerator, array($this->ldap, $username));
 
         // Auth
         try {
             $this->ldap->connect(); // @todo: Pullrequest to toyota, to check whether we're already connected
-            $this->ldap->bind($username . ($this->fqdn ? '@'.$this->fqdn : ''), $password);
+            $this->ldap->bind($username, $password);
             $data = array(
                 'username' => $username,
                 'fqdn' => $this->fqdn,
@@ -190,6 +190,10 @@ class Authenticator extends Object implements IAuthenticator
         if(Strings::endsWith($username, $domain)) {
             $username = Strings::substring($username, 0, strpos($username, $domain));
         }
+
+		if(!empty($this->fqdn)) {
+			$username .= '@' . $this->fqdn;
+		}
 
         return $username;
     }

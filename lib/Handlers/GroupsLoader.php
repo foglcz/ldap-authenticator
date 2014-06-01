@@ -96,7 +96,7 @@ class GroupsLoader extends BaseHandler
         $iterator->setIteratorMode(\SplQueue::IT_MODE_DELETE);
 
         // Load membership
-        $raw = $ldap->search(null, str_replace(':username:', $userData['username'], self::$UserLookup), true, array('memberof'));
+        $raw = $ldap->search(null, Utils::getUserLookup($userData['username']), true, array('memberof'));
         if(!$raw->current() instanceof Node) {
             return array();
         }

@@ -7,6 +7,7 @@
  */
 namespace foglcz\LDAP\Success;
 
+use foglcz\LDAP\Utils;
 use Toyota\Component\Ldap\Core\Manager;
 use Toyota\Component\Ldap\Core\Node;
 use Toyota\Component\Ldap\Core\NodeAttribute;
@@ -27,9 +28,7 @@ class ThumbnailLoader extends BaseHandler
      */
     public static function getThumbnail(Manager $ldap, array $userData)
     {
-        $username = $userData['username'];
-
-        $raw = $ldap->search(null, str_replace(':username:', $username, self::$UserLookup), true, array('thumbnailphoto'));
+        $raw = $ldap->search(null, Utils::getUserLookup($userData['username']), true, array('thumbnailphoto'));
         if(!$raw->current() instanceof Node) {
             return false;
         }

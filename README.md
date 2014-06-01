@@ -108,7 +108,7 @@ The authentication flow is as follows:
 
 	```
 	array (2)
-		username => "name.surname" (6)
+		username => "name.surname@yourdomain.local" (6)
 		fqdn => "yourdomain.local" (14)
 	```
 6. Loop through success handlers. By default this in-loads User Data information from LDAP, and in-loads the groups
@@ -119,7 +119,7 @@ The authentication flow is as follows:
 
 	```
 	array (8)
-		username => "name.surname" (6)
+		username => "name.surname@yourdomain.local" (6)
 		fqdn => "yourdomain.local" (14)
 		userinfo => array (10)
 			lastName => "Surname | COMPANY" (17)
@@ -277,20 +277,43 @@ public function createIdentity(Toyota\Component\Ldap\Core\Manager $ldap, array $
 The username generator takes any user-supplied input and transforms it into LDAP-valid username. In general, we have
 two scenarios which we can find in the wild:
 
-1. The AD Forrest name is **same** as user e-mail domain (forrest name is `yourcompany.com`
-2. The AD Forrest name is **different** than user e-mail domain (forrest name is `yourcompany.local`
+1. The AD Forrest name is **same** as user e-mail domain (forrest name is `yourcompany.com`)
+2. The AD Forrest name is **different** than user e-mail domain (forrest name is `yourcompany.local`)
 
-Default username generator takes care of both. This is also a reason for three parameters constructor of Authenticator.
+There are also multiple ways how you can authenticate against LDAP:
 
-What we wanted to do, is to enable our users to login either with `name.surname` and/or with `name.surname@yourcompany.com`,
-while having *different* forrest name. By default, the username generator takes the user-supplied input, strips off the
-`@yourcompany.com` part (if present), and appends `@yourcompany.local` part.
+1. Using the NT-format `domain\username`
+2. Using the post-2000 FQDN format `username@domain.tld` (that would be the forrest name, like yourdomain.local)
 
-The returned username is then used for authentication within LDAP.
+The authenticator employs second option - authentication with full FQDN - by default. This is also the reason for
+two parameters in the constructor:
+
+```
+class: foglcz\ldap\Authenticator(%ldap%, "<e-mail domain>", "<ldap domain>")
+```
+
+Default username generator works as follows:
+
+- Check whether the user has supplied full e-mail -- checked against the second constructor
+- If the user has indeed supplied the e-mail, remove the `@domain.com` part
+- Append the `@domain.local` **if** it has been supplied to the constructor.
+
+Subsequent success handlers are using following query string to search for the user:
+
+```
+(|(userprincipalname=:upn:)(sAMAccountName=:username:))
+```
+
+That means, the success handlers search either for plain pre-2000 username **or the user's UPN** (which is the
+username@domain.local format). This has some interesting implications, as seen below.
 
 #### Generator common usage ####
-The default common usage of username generator would be to take the username, and prepend the pre-2000 authentication
-domain. To use it, we would define following function in our `UserManager` class:
+The default common usage of username generator would be to post-process given username into any format you'd like.
+For example, you'd like your people to use the default NT-format - thus returning the user supplied username by
+default.
+
+OR you would like to use the pre-2000 usernames as login usernames, but not using the FQDN parts. For both, you can
+freely define any logic you want to, in username generator:
 
 ```php
 public function createUsername(Manager $ldap, $username)
@@ -307,6 +330,11 @@ authenticator:
 	setup:
 		- setUsernameGenerator([@userModel, 'createUsername'])
 ```
+
+**Implications of the username generator rewrite**
+
+Default success handlers are using lookup via UPN **or** pre-2000 account name. This means, that the default success
+handlers will strip-off any `domain\` and `@upn.local` parts of the given username.
 
 Extend with your class
 ----------------------

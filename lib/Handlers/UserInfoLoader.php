@@ -7,6 +7,7 @@
  */
 namespace foglcz\LDAP\Success;
 
+use foglcz\LDAP\Utils;
 use Toyota\Component\Ldap\Core\Manager;
 use Toyota\Component\Ldap\Core\Node;
 use Toyota\Component\Ldap\Core\NodeAttribute;
@@ -44,6 +45,7 @@ class UserInfoLoader extends BaseHandler
             'department' => 'department',
 
             // LDAP attributes
+			'sAMAccountName' => 'sAMAccountName',
             'userPrincipalName' => 'UPN',
             'proxyAddresses' => 'proxyAddresses',
             'location' => 'ldapLocation',
@@ -60,8 +62,8 @@ class UserInfoLoader extends BaseHandler
      */
     public function getUserInfo(Manager $ldap, array $userData)
     {
-        // Load
-        $raw = $ldap->search(null, str_replace(':username:', $userData['username'], self::$UserLookup), true, array_keys($this->loadInfo));
+		// Load
+        $raw = $ldap->search(null, Utils::getUserLookup($userData['username']), true, array_keys($this->loadInfo));
         if(!$raw->current() instanceof Node) {
             return array();
         }
