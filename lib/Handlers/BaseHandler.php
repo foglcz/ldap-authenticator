@@ -15,7 +15,7 @@ namespace foglcz\LDAP\Success;
 abstract class BaseHandler
 {
 
-    /** @var string Lookup string for finding users in LDAP. This is pre-2000 field in most of Active Directories. */
-    public static $UserLookup = '(|(userprincipalname=:upn:)(sAMAccountName=:username:))';
+	/** @var string Lookup string for finding users in LDAP. This is pre-2000 field in most of Active Directories. */
+	public static $UserLookup = '(|(userprincipalname=:upn:)(sAMAccountName=:username:))';
 
 }

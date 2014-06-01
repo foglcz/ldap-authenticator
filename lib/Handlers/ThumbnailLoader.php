@@ -20,28 +20,28 @@ use Toyota\Component\Ldap\Core\NodeAttribute;
 class ThumbnailLoader extends BaseHandler
 {
 
-    /**
-     * Load thumbnail and save it's base64 in userdata
-     * @param Manager $ldap
-     * @param array $userData
-     * @return string|false
-     */
-    public static function getThumbnail(Manager $ldap, array $userData)
-    {
-        $raw = $ldap->search(null, Utils::getUserLookup($userData['username']), true, array('thumbnailphoto'));
-        if(!$raw->current() instanceof Node) {
-            return false;
-        }
+	/**
+	 * Load thumbnail and save it's base64 in userdata
+	 * @param Manager $ldap
+	 * @param array $userData
+	 * @return string|false
+	 */
+	public static function getThumbnail(Manager $ldap, array $userData)
+	{
+		$raw = $ldap->search(null, Utils::getUserLookup($userData['username']), true, array('thumbnailphoto'));
+		if(!$raw->current() instanceof Node) {
+			return false;
+		}
 
-        /** @var NodeAttribute[] $attrs */
-        $attrs = $raw->current()->getAttributes();
+		/** @var NodeAttribute[] $attrs */
+		$attrs = $raw->current()->getAttributes();
 
-        // Load user image
-        if (empty($attrs['thumbnailPhoto']) !== true && $attrs['thumbnailPhoto']->getValues()) {
-            $img = $attrs['thumbnailPhoto']->getValues();
-            return 'data:image/jpg' . ';base64,' . base64_encode($img[0]);
-        }
+		// Load user image
+		if (empty($attrs['thumbnailPhoto']) !== true && $attrs['thumbnailPhoto']->getValues()) {
+			$img = $attrs['thumbnailPhoto']->getValues();
+			return 'data:image/jpg' . ';base64,' . base64_encode($img[0]);
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

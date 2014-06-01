@@ -14,28 +14,28 @@ use foglcz\LDAP\Success\BaseHandler;
  */
 class Utils
 {
-    /**
-     * Load group name from DN
-     *
-     * @param string $dn
-     * @return string
-     */
-    public static function loadNameFromDn($dn)
-    {
-        $name = '';
-        $dn = explode(',', $dn);
-        foreach ($dn as $one) {
-            if (strpos($one, 'CN=') === false) {
-                continue;
-            }
+	/**
+	 * Load group name from DN
+	 *
+	 * @param string $dn
+	 * @return string
+	 */
+	public static function loadNameFromDn($dn)
+	{
+		$name = '';
+		$dn = explode(',', $dn);
+		foreach ($dn as $one) {
+			if (strpos($one, 'CN=') === false) {
+				continue;
+			}
 
-            $parts = explode('=', $one);
-            $name = $parts[1];
-            break;
-        }
+			$parts = explode('=', $one);
+			$name = $parts[1];
+			break;
+		}
 
-        return $name;
-    }
+		return $name;
+	}
 
 	/**
 	 * Get full user lookup string
