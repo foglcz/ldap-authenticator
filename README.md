@@ -104,6 +104,7 @@ The authentication flow is as follows:
 4. Bind the given username to the domain, effectively authenticating against the LDAP. User is bind in format of
  	username@fqdn , so in your case it might be username@yourdomain.local
 5. If no exception is thrown, $userData array is created with following attributes:
+
 	```
 	array (2)
 		username => "name.surname" (6)
@@ -114,6 +115,7 @@ The authentication flow is as follows:
 	will show up in the memberships.
 
 	Note that here, your registered callbacks are called as well:
+
 	```
 	array (8)
 		username => "name.surname" (6)
