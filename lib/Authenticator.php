@@ -20,7 +20,6 @@ use Toyota\Component\Ldap\Core\Manager;
 use Toyota\Component\Ldap\Platform\Native\Driver;
 use Toyota\Component\Ldap\Exception\BindException;
 
-
 /**
  * Base authenticator for LDAP
  *
@@ -78,7 +77,7 @@ class Authenticator extends Object implements IAuthenticator
     public function __construct(array $config, $domain, $fqdn = '', Manager $manager = null)
     {
         $this->domain = $domain;
-        $this->fqdn = (!empty($domain) && empty($fqdn)) ? $domain : $fqdn;
+        $this->fqdn = $fqdn;
 
         // Ldap setter
         isset($config['baseDn']) ? $config['base_dn'] = $config['baseDn'] : null;
@@ -110,7 +109,7 @@ class Authenticator extends Object implements IAuthenticator
     /**
      * @param callable $handler <string>function(Toyota\Component\Ldap\Core\Manager, $username)
      */
-    public function setUsernameGenerator(Callable $handler)
+    public function setUsernameGenerator($handler)
     {
         $this->usernameGenerator = $handler;
     }
@@ -119,7 +118,7 @@ class Authenticator extends Object implements IAuthenticator
      * @param string $dataKey $userData[$dataKey] = return of the callback
      * @param Callable $handler <void>function(Toyota\Component\Ldap\Core\Manager, $userData)
      */
-    public function addSuccessHandler($dataKey, Callable $handler)
+    public function addSuccessHandler($dataKey, $handler)
     {
         $this->onSuccess[$dataKey] = $handler;
     }
@@ -135,7 +134,7 @@ class Authenticator extends Object implements IAuthenticator
     /**
      * @param callable $handler <IIdentity>function(Toyota\Component\Ldap\Core\Manager, $userData)
      */
-    public function setIdentityGenerator(Callable $handler)
+    public function setIdentityGenerator($handler)
     {
         $this->identityGenerator = $handler;
     }
@@ -155,10 +154,10 @@ class Authenticator extends Object implements IAuthenticator
         // Auth
         try {
             $this->ldap->connect(); // @todo: Pullrequest to toyota, to check whether we're already connected
-            $this->ldap->bind($username, $password);
+            $this->ldap->bind($username . ($this->fqdn ? '@'.$this->fqdn : ''), $password);
             $data = array(
                 'username' => $username,
-                'fqdn' => Strings::substring($this->fqdn, 1),
+                'fqdn' => $this->fqdn,
             );
         } catch (BindException $e) {
             throw new AuthenticationException('Username or password is not valid', $e->getCode(), $e);
@@ -166,7 +165,7 @@ class Authenticator extends Object implements IAuthenticator
 
         // Success handlers
         foreach ($this->onSuccess as $key => $handler) {
-            $data[$key] = $handler($this->ldap, $data);
+            $data[$key] = call_user_func_array($handler, array($this->ldap, $data));
         }
 
         // Allow/refuse login based on groups
@@ -191,10 +190,6 @@ class Authenticator extends Object implements IAuthenticator
         if(Strings::endsWith($username, $domain)) {
             $username = Strings::substring($username, 0, strpos($username, $domain));
         }
-
-		if(!empty($this->fqdn)) {
-			$username .= '@' . $this->fqdn;
-		}
 
         return $username;
     }
