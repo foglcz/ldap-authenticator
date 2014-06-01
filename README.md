@@ -229,33 +229,33 @@ Success handlers are used to
 The identity generator is used to generate an `\Nette\Security\Identity` class from the given `$userData`, which can
 be extended by SuccessHandlers as seen above. The default generator looks like this:
 
-	```php
-	public function createIdentity(Toyota\Component\Ldap\Core\Manager $ldap, array $userData)
-	{
-		$roles = array();
-		if(!isset($userData['memberOf'])) {
-			throw new PossibleConfigurationErrorException('User\'s memberOf index is not set; maybe reset default groups handler?');
-		}
-
-		// Load roles based on membership if needed
-		if(isset($this->config['loadRolesAsMailGroups'])) {
-			$roles = array_merge($roles, $this->loadRoleMailsFromGroups($userData));
-		}
-
-		// Load roles mapping if set
-		if(isset($this->config['rolesMap'])) {
-			$roles = array_merge($roles, $this->loadRoleMapping($userData));
-		}
-
-		// In-load admin groups if requested
-		if(isset($this->config['adminGroups']) && !in_array('admin', $roles) && $this->loadIsAdminMember($userData)) {
-			$roles[] = 'admin';
-		}
-
-		// Create identity & return
-		return new Identity(isset($userData['id']) ? $userData['id'] : $userData['username'], $roles, $userData);
+```php
+public function createIdentity(Toyota\Component\Ldap\Core\Manager $ldap, array $userData)
+{
+	$roles = array();
+	if(!isset($userData['memberOf'])) {
+		throw new PossibleConfigurationErrorException('User\'s memberOf index is not set; maybe reset default groups handler?');
 	}
-	```
+
+	// Load roles based on membership if needed
+	if(isset($this->config['loadRolesAsMailGroups'])) {
+		$roles = array_merge($roles, $this->loadRoleMailsFromGroups($userData));
+	}
+
+	// Load roles mapping if set
+	if(isset($this->config['rolesMap'])) {
+		$roles = array_merge($roles, $this->loadRoleMapping($userData));
+	}
+
+	// In-load admin groups if requested
+	if(isset($this->config['adminGroups']) && !in_array('admin', $roles) && $this->loadIsAdminMember($userData)) {
+		$roles[] = 'admin';
+	}
+
+	// Create identity & return
+	return new Identity(isset($userData['id']) ? $userData['id'] : $userData['username'], $roles, $userData);
+}
+```
 
 **Username generator**
 
