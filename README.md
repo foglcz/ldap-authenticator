@@ -221,11 +221,11 @@ authenticator:
 		- setIdentityGenerator([@userModel, 'authGenerateIdentity'])
 ```
 
-**Success handlers**
+#### Success handlers ####
 
 Success handlers are used to
 
-**Identity generator**
+#### Identity generator ####
 
 The identity generator is used to generate an `\Nette\Security\Identity` class from the given `$userData`, which can
 be extended by SuccessHandlers as seen above. The default generator looks like this:
@@ -258,7 +258,7 @@ public function createIdentity(Toyota\Component\Ldap\Core\Manager $ldap, array $
 }
 ```
 
-**Username generator**
+#### Username generator ####
 
 Extend with your class
 ----------------------
