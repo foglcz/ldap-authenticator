@@ -32,7 +32,6 @@ $ composer require foglcz/ldap-authenticator --no-dev
 Use
 ---
 1. Open `app/model/UserManager.php` and **remove** the `implements Nette\Security\IAuthenticator`
-
 2. Open `app/config/config.neon` file and change default `UserManager` definition.
 
 	```
