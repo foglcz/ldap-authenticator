@@ -25,7 +25,7 @@ Include once, extend forever. Under MIT license.
 Install
 -------
 ```
-$ composer require foglcz/ldap-authenticator --no-dev
+$ composer require foglcz/ldap-authenticator
 ```
 
 Use
