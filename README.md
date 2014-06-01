@@ -142,7 +142,7 @@ The authentication flow is as follows:
 
 7. Check whether the user is in any of the groups that are either allowed or refused to login. Throw exception when
 	user is not allowed to login.
-8. Call identity provider and give back the identity returned. For definition, see Callbacks section.
+8. Call identity provider and give back the identity returned. For definition, see [Callbacks](#callback-options) section.
 
 Most of these are built-in, enabled and disabled by altering the configuration (see below.)
 
