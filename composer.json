@@ -15,8 +15,7 @@
     },
     "require":{
         "php": ">= 5.3.2",
-        "nette/security": ">= 2.2.0",
-        "nette/utils": ">= 2.2.0",
+        "nette/nette": "<2.2.0",
         "tiesa/ldap": "dev-master"
     },
     "minimum-stability": "dev",
