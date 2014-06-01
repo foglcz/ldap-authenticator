@@ -98,7 +98,8 @@ The authentication flow is as follows:
 1. `$user->login(username, password);`
 2. Post-process the given username. By default, we strip out the domain parameter (see below) of the constructor, and
 	replace it with FQDN. Therefore, you can have "yourdomain.local" Active Directory forrest, while logging in with
-	the "email@yourdomain.com" usernames - or just with "email" part of the login. See more on this below.
+	the "email@yourdomain.com" usernames - or just with "email" part of the login. See [Callbacks section](#callback-options)
+	for more details
 3. Connect to LDAP server as specified in the configuration - the library [tiesa/ldap](https://github.com/ccottet/ldap)
     is used for this purpose
 4. Bind the given username to the domain, effectively authenticating against the LDAP. User is bind in format of
@@ -142,7 +143,7 @@ The authentication flow is as follows:
 
 7. Check whether the user is in any of the groups that are either allowed or refused to login. Throw exception when
 	user is not allowed to login.
-8. Call identity provider and give back the identity returned. For definition, see [Callbacks](#callback-options) section.
+8. Call identity provider and give back the identity returned. For definition, see [Identity generator](#identity-generator) section.
 
 Most of these are built-in, enabled and disabled by altering the configuration (see below.)
 
@@ -190,11 +191,11 @@ Authenticator throws following exceptions:
 
 - `class PossibleConfigurationErrorException extends AuthenticationException`
   Thrown **only** when you forcefully turn off loadGroups parameter, but still employ functionality, which is dependant
-  on the groups loading. These are allowLogin, refuseLogin, adminGroups, loadRolesAsMailGroups and rolesMap.
+  on the groups loading. These are allowLogin, refuseLogin, adminGroups, loadRolesAsMailGroups and rolesMap. **Note**:
+  The exception is not thrown when you turn off groups loading, but set your own `memberOf` success handler.
 
 - `class AuthenticationException extends \Nette\Security\AuthenticationException`
-  Thrown when user is, in fact, not allowed to login (the bind against LDAP failed.) Note that instead of nette-default
-  behaviour of specifying whether the username **or** password is wrong, by definition and our preference, we use simple
+  Thrown when user is, in fact, not allowed to login (the bind against LDAP failed.) Note that we use simple
   "Username or password is not valid" message.
 
 
@@ -223,12 +224,25 @@ authenticator:
 
 #### Success handlers ####
 
-Success handlers are used to
+Success handlers are used to in-load more information to the `$userData` array. The userData is then used within
+Identity generator, as a third parameter of generated identity.
+
+Default success handler is described in [top section](#use) and returns data, which will be saved within `$userData`
+under specified key. Registration function takes two parameters:
+
+1. Key under which to store function result
+2. Callback which is called with parameters `Manager` and `$userData`.
+
+The success handlers constains no magic, and can be used for effectively anything you want.
 
 #### Identity generator ####
 
 The identity generator is used to generate an `\Nette\Security\Identity` class from the given `$userData`, which can
-be extended by SuccessHandlers as seen above. The default generator looks like this:
+be extended by SuccessHandlers as seen above. The default identity generator looks up presence of `$userData['memberOf']`
+parameter, to in-load the roles. The default identity generator also appends `admin` role if user is present within
+admin groups as defined in config.
+
+Piece of sourcecode is worth a thousand words. Default identity generator looks like this:
 
 ```php
 public function createIdentity(Toyota\Component\Ldap\Core\Manager $ldap, array $userData)
@@ -260,23 +274,45 @@ public function createIdentity(Toyota\Component\Ldap\Core\Manager $ldap, array $
 
 #### Username generator ####
 
-Extend with your class
-----------------------
-Want to handle exceptions by yourself? Extend the class and use catch blocks:
+The username generator takes any user-supplied input and transforms it into LDAP-valid username. In general, we have
+two scenarios which we can find in the wild:
+
+1. The AD Forrest name is **same** as user e-mail domain (forrest name is `yourcompany.com`
+2. The AD Forrest name is **different** than user e-mail domain (forrest name is `yourcompany.local`
+
+Default username generator takes care of both. This is also a reason for three parameters constructor of Authenticator.
+
+What we wanted to do, is to enable our users to login either with `name.surname` and/or with `name.surname@yourcompany.com`,
+while having *different* forrest name. By default, the username generator takes the user-supplied input, strips off the
+`@yourcompany.com` part (if present), and appends `@yourcompany.local` part.
+
+The returned username is then used for authentication within LDAP.
+
+#### Generator common usage ####
+The default common usage of username generator would be to take the username, and prepend the pre-2000 authentication
+domain. To use it, we would define following function in our `UserManager` class:
 
 ```php
-class CustomAuth extends \foglcz\LDAP\Authenticator {
-
-	public function auth(array $credentials) {
-		$identity = parent::authenticate($credentials);
-
-		if($identity->roles['']) {
-			return $identity;
-		}
-	}
-
+public function createUsername(Manager $ldap, $username)
+{
+	return 'yourdomain\' . $username;
 }
 ```
+
+In order to use this generator, following should be added to `setup` part within `config.neon`:
+
+```
+authenticator:
+	class: foglcz\ldap\Authenticator(%ldap%, "whatever")
+	setup:
+		- setUsernameGenerator([@userModel, 'createUsername'])
+```
+
+Extend with your class
+----------------------
+There is little need to extend the default authenticator by yours, but thats entirely possible. You just need to
+remember, that in `config.neon services:` section you can have **only one Authenticator** - that means that if you
+extend the `\foglcz\LDAP\Authenticator`, you also need to remove it from your project's config.neon.
 
 Contribute
 ----------
@@ -288,5 +324,9 @@ always merged by the author of the pull request - not by the author of repositor
 not revoked after merge.
 
 Originally created by Pavel `@foglcz` Ptacek, (c) 2014
+
+Contributors so far
+- Pavel Ptacek
+- YOU!
 
 [Fork me!](https://github.com/foglcz/ldap-authenticator/fork)
