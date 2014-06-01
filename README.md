@@ -8,7 +8,7 @@ Supported out of the box:
 - User groups membership, **including group inheritance.** (*groupA member of groupB, which is member of groupC? No problem!*)
 - Groups whitelist for login (aka "allowLogin")
 - Groups blacklist for login (aka "refuseLogin")
-- Admin groups appender - user will have "admin" role, if he's present in some of the specified LDAP groups
+- Admin role appender - user will have "admin" role, if he's present in some of the specified LDAP groups
 - Groups-to-roles mapping based on group DN, name and/or e-mail address
 - Post-processing data **before** identity creation based on Callbacks
 	- used for loading of user database id and more
@@ -68,12 +68,12 @@ Use
 	/**
 	 * Success handler for LDAP authenticator - loads the ID in database
 	 *
-	 * @param Manager $ldap
+	 * @param \Toyota\Component\Ldap\Core\Manager $ldap
 	 * @param array $userData
 	 * @throws Security\AuthenticationException
 	 * @return int
 	 */
-	public function getAuthId(Manager $ldap, array $userData)
+	public function getAuthId(\Toyota\Component\Ldap\Core\Manager $ldap, array $userData)
 	{
 		$username = 'ldap/' . $userData['username'];
 		if($user = $this->database->table('user')->where('username = ?', $username)->fetch()) {
@@ -99,7 +99,8 @@ The authentication flow is as follows:
 2. Post-process the given username. By default, we strip out the domain parameter (see below) of the constructor, and
 	replace it with FQDN. Therefore, you can have "yourdomain.local" Active Directory forrest, while logging in with
 	the "email@yourdomain.com" usernames - or just with "email" part of the login. See more on this below.
-3. Connect to LDAP server as specified in the configuration - the library tieso/ldap is used for this purpose
+3. Connect to LDAP server as specified in the configuration - the library [tieso/ldap](https://github.com/ccottet/ldap)
+    is used for this purpose
 4. Bind the given username to the domain, effectively authenticating against the LDAP. User is bind in format of
  	username@fqdn , so in your case it might be username@yourdomain.local
 5. If no exception is thrown, $userData array is created with following attributes:
