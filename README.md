@@ -166,7 +166,7 @@ parameters:
 		adminGroups: ['VPN_FG', 'Administrators'] # add "admin" role if present in the list of roles. Groups can be specified as FQDN's, names and/or e-mail addresses.
 ```
 
--- Allow / refuse logic
+-- Allow / refuse logic --
 
 The authenticator employs refuse-first authentication principle. If you define both allow login & refuse login, members
 of refuse groups will be always refused, regardless of whether they are member of allowed groups.
