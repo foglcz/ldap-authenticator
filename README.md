@@ -98,7 +98,7 @@ The authentication flow is as follows:
 1. `$user->login(username, password);`
 2. Post-process the given username. By default, we strip out the domain parameter (see below) of the constructor, and
 	replace it with FQDN. Therefore, you can have "yourdomain.local" Active Directory forrest, while logging in with
-	the "email@yourdomain.com" usernames - or just with "email" part of the login. See [Callbacks section](#callback-options)
+	the "email@yourdomain.com" usernames - or just with "email" part of the login. See [Username generator](#username-generator)
 	for more details
 3. Connect to LDAP server as specified in the configuration - the library [tiesa/ldap](https://github.com/ccottet/ldap)
     is used for this purpose
@@ -158,11 +158,11 @@ parameters:
 		port: 3268
 		baseDn: 'DC=yourcompany,DC=com' # Base searchpath within your LDAP
 		loadGroups: true            # By default on, turn off if you don't want to load groups
-		refuseLogin: ['DL USA']     # Either group FQDN's, names and/or e-mail addresses || refused
-		allowLogin:  ['DL VPN']     # Either group FQDN's, names and/or e-mail addresses || null == pustit vsechny krome refuse
+		refuseLogin: ['DL USA']     # Either group FQDN's, names and/or e-mail addresses
+		allowLogin:  ['DL VPN']     # Either group FQDN's, names and/or e-mail addresses
 		loadRolesAsMailGroups: true # By default off (false/not defined). If on, the group e-mails will be used as roles of the given user
-		rolesMap:                   # see below
-			VPN_FG: vpn
+		rolesMap:                   # ldapGroup => roleName array mapping; will take either group FQDN, name and/or e-mail addr.
+			VPN_FG: vpn             # If a user is present in such group, the latter value will be used as a user role by identity generator.
 			"DL Property": "property"
 		adminGroups: ['VPN_FG', 'Administrators'] # add "admin" role if present in the list of roles. Groups can be specified as FQDN's, names and/or e-mail addresses.
 ```
@@ -295,7 +295,7 @@ domain. To use it, we would define following function in our `UserManager` class
 ```php
 public function createUsername(Manager $ldap, $username)
 {
-	return 'yourdomain\' . $username;
+	return 'yourdomain\\' . $username;
 }
 ```
 
