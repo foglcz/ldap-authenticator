@@ -10,13 +10,13 @@ Supported out of the box:
 - Groups blacklist for login (aka "refuseLogin")
 - Admin role appender - user will have "admin" role, if he's present in some of the specified LDAP groups
 - Groups-to-roles mapping based on group DN, name and/or e-mail address
-- Post-processing data **before** identity creation based on Callbacks
+- Post-processing data **before** identity creation based on [Callbacks](#callback-options)
 	- used for loading of user database id and more
-- Identity generator from loaded data, based on callback - don't like default behaviour? Rewrite it!
-- Username generator based on callback - following logins are valid by default:
+- [Identity generator](#identity-generator) from loaded data, based on callback - don't like default behaviour? Rewrite it!
+- [Username generator](#username-generator) based on callback - following logins are valid by default:
 	- name.surname
 	- name.surname@yourdomain.com
-- Success login handlers for integrating the LDAP into your application. In example, this is used for both
+- [Success login handlers](#success-handlers) for integrating the LDAP into your application. In example, this is used for both
   userdata loading from LDAP (thumbnails, name & surname, etc.),  **and** for loading the ID from database (so that
   your database model can work seamlessly with LDAP.)
 
