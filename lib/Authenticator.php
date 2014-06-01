@@ -9,7 +9,6 @@ namespace foglcz\LDAP;
 
 use foglcz\LDAP\Success\GroupsLoader;
 use foglcz\LDAP\Success\UserInfoLoader;
-use Nette\Object;
 use Nette\Security\AuthenticationException;
 use Nette\Security\IAuthenticator;
 use Nette\Security\Identity;
@@ -25,7 +24,7 @@ use Toyota\Component\Ldap\Exception\BindException;
  *
  * @package foglcz\ldap
  */
-class Authenticator extends Object implements IAuthenticator
+class Authenticator implements IAuthenticator
 {
 	/**
 	 * The username generator from user supplied input. By default, this stripps down the e-mail part -- in example,
