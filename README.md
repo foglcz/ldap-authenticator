@@ -5,8 +5,7 @@ The LDAP/Active Directory authenticator plugin for Nette Framework.
 Supported out of the box:
 - LDAP Authentication (obviously)
 - User information loading, including user picture in AD
-- User groups membership, **including group inheritance**
-	*groupA member of groupB, which is member of groupC? No problem!*
+- User groups membership, **including group inheritance.** (*groupA member of groupB, which is member of groupC? No problem!*)
 - Groups whitelist for login (aka "allowLogin")
 - Groups blacklist for login (aka "refuseLogin")
 - Admin groups appender - user will have "admin" role, if he's present in some of the specified LDAP groups
