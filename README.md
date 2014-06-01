@@ -325,8 +325,4 @@ not revoked after merge.
 
 Originally created by Pavel `@foglcz` Ptacek, (c) 2014
 
-Contributors so far
-- Pavel Ptacek
-- YOU!
-
-[Fork me!](https://github.com/foglcz/ldap-authenticator/fork)
+Full list of contributors can be seen in [CONTRIBUTORS.md](https://github.com/foglcz/ldap-authenticator/blob/master/CONTRIBUTORS.md) file.
