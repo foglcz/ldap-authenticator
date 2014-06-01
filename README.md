@@ -34,59 +34,60 @@ Use
 1. Open `app/model/UserManager.php` and **remove** the `implements Nette\Security\IAuthenticator`
 
 2. Open `app/config/config.neon` file and change default `UserManager` definition.
-```
-services:
-	- App\Model\UserManager
-```
 
-  becomes:
+	```
+	services:
+		- App\Model\UserManager
+	```
 
-```
-services:
-	userManager: App\Model\UserManager
-```
+	becomes:
+
+	```
+	services:
+		userManager: App\Model\UserManager
+	```
 
 3. Open `app/config/config.neon` file and **add** following to `services` and `parameters` sections:
 
-```
-parameters:
-	ldap:
-		hostname: 'xxx.xxx.xxx.xxx'  # your LDAP server ip
-		port: 3268					 # your LDAP server port (if different than default)
-		baseDn: 'DC=domain,DC=local' # your LDAP base DN search - usually change this to your domain.tld
-		loadGroups: true 		     # set to false if you don't want the auto groups loading & roles loading
+	```
+	parameters:
+		ldap:
+			hostname: 'xxx.xxx.xxx.xxx'  # your LDAP server ip
+			port: 3268					 # your LDAP server port (if different than default)
+			baseDn: 'DC=domain,DC=local' # your LDAP base DN search - usually change this to your domain.tld
+			loadGroups: true 		     # set to false if you don't want the auto groups loading & roles loading
 
-services:
-	authenticator:
-		class: foglcz\ldap\Authenticator(%ldap%, "yourcompany.com", "yourcomany.local") # Third parameter optional, used if you have different e-mail domains than the AD domain.
-		setup:
-			- addSuccessHandler('id', [@userManager, 'getAuthId'])
-```
+	services:
+		authenticator:
+			class: foglcz\ldap\Authenticator(%ldap%, "yourcompany.com", "yourcomany.local") # Third parameter optional, used if you have different e-mail domains than the AD domain.
+			setup:
+				- addSuccessHandler('id', [@userManager, 'getAuthId'])
+	```
 
 4. Add following method into your `UserManager` class:
 
-```php
-/**
- * Success handler for LDAP authenticator - loads the ID in database
- *
- * @param Manager $ldap
- * @param array $userData
- * @throws Security\AuthenticationException
- * @return int
- */
-public function getAuthId(Manager $ldap, array $userData)
-{
-	$username = 'ldap/' . $userData['username'];
-	if($user = $this->database->table('user')->where('username = ?', $username)->fetch()) {
-		return $user->id;
+	```php
+	/**
+	 * Success handler for LDAP authenticator - loads the ID in database
+	 *
+	 * @param Manager $ldap
+	 * @param array $userData
+	 * @throws Security\AuthenticationException
+	 * @return int
+	 */
+	public function getAuthId(Manager $ldap, array $userData)
+	{
+		$username = 'ldap/' . $userData['username'];
+		if($user = $this->database->table('user')->where('username = ?', $username)->fetch()) {
+			return $user->id;
+		}
+
+		return $this->database->table('user')->insert(array('username' => $username));
 	}
+	```
 
-	return $this->database->table('user')->insert(array('username' => $username));
-}
-```
-
-The getAuthId function returns id of the identity, that gets generated - therefore, in rest of your application,
-you can freely use `$user->id` for relations etc.
+	The getAuthId function returns id of the identity, that gets generated - therefore, in rest of your application,
+	you can freely use `$user->id` for relations etc.
 
 Authentication flow
 -------------------
