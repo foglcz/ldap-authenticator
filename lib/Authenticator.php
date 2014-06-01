@@ -79,7 +79,6 @@ class Authenticator extends Object implements IAuthenticator
     {
         $this->domain = $domain;
         $this->fqdn = (!empty($domain) && empty($fqdn)) ? $domain : $fqdn;
-        (empty($this->fqdn)) ? : $this->fqdn = '@' . $this->fqdn;
 
         // Ldap setter
         isset($config['baseDn']) ? $config['base_dn'] = $config['baseDn'] : null;
@@ -156,7 +155,7 @@ class Authenticator extends Object implements IAuthenticator
         // Auth
         try {
             $this->ldap->connect(); // @todo: Pullrequest to toyota, to check whether we're already connected
-            $this->ldap->bind($username . $this->fqdn, $password);
+            $this->ldap->bind($username, $password);
             $data = array(
                 'username' => $username,
                 'fqdn' => Strings::substring($this->fqdn, 1),
@@ -189,9 +188,13 @@ class Authenticator extends Object implements IAuthenticator
         $username = Strings::trim(Strings::lower($username));
         $domain = '@' . Strings::trim(Strings::lower($this->domain));
 
-        if (Strings::endsWith($username, $domain)) {
+        if(Strings::endsWith($username, $domain)) {
             $username = Strings::substring($username, 0, strpos($username, $domain));
         }
+
+		if(!empty($this->fqdn)) {
+			$username .= '@' . $this->fqdn;
+		}
 
         return $username;
     }
