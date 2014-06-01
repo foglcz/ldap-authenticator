@@ -99,7 +99,7 @@ The authentication flow is as follows:
 2. Post-process the given username. By default, we strip out the domain parameter (see below) of the constructor, and
 	replace it with FQDN. Therefore, you can have "yourdomain.local" Active Directory forrest, while logging in with
 	the "email@yourdomain.com" usernames - or just with "email" part of the login. See more on this below.
-3. Connect to LDAP server as specified in the configuration - the library [tieso/ldap](https://github.com/ccottet/ldap)
+3. Connect to LDAP server as specified in the configuration - the library [tiesa/ldap](https://github.com/ccottet/ldap)
     is used for this purpose
 4. Bind the given username to the domain, effectively authenticating against the LDAP. User is bind in format of
  	username@fqdn , so in your case it might be username@yourdomain.local
@@ -140,7 +140,8 @@ The authentication flow is as follows:
 				mail => "decisions" (12)
 	```
 
-7. Check whether the user is in any of the groups that are either allowed or refused to login. Throw exception otherwise.
+7. Check whether the user is in any of the groups that are either allowed or refused to login. Throw exception when
+	user is not allowed to login.
 8. Call identity provider and give back the identity returned. For definition, see Callbacks section.
 
 Most of these are built-in, enabled and disabled by altering the configuration (see below.)
