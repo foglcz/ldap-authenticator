@@ -101,7 +101,7 @@ class GroupsLoader extends BaseHandler
 			return array();
 		}
 		$attrs = $raw->current()->getAttributes();
-		if(!$attrs['memberOf'] instanceof NodeAttribute) {
+		if(!array_key_exists('memberof', $attrs) || !$attrs['memberOf'] instanceof NodeAttribute) {
 			return array();
 		}
 
