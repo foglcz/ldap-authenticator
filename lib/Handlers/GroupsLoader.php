@@ -38,6 +38,10 @@ class GroupsLoader extends BaseHandler
 
 		// Merge the two and return
 		foreach($memberOf as $dn => $name) {
+			if(!isset($allGroups[$dn])) {
+				continue;
+			}
+
 			$memberOf[$dn] = $allGroups[$dn];
 		}
 
