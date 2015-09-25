@@ -291,12 +291,15 @@ class Authenticator implements IAuthenticator
 				$roles[] = $this->config['rolesMap'][$groupDn];
 			}
 
-			$name = $group['name'];
+			$name = (is_array($group) && array_key_exists('name', $group))
+				? $group['name']
+				: preg_replace('~CN=(.+?),.+~', '$1', $groupDn);
+
 			if(isset($this->config['rolesMap'][$name])) {
 				$roles[] = $this->config['rolesMap'][$name];
 			}
 
-			$mail = $group['mail'];
+			$mail = (is_array($group) && array_key_exists('name', $group)) ? $group['mail'] : NULL;
 			if(isset($this->config['rolesMap'][$mail])) {
 				$roles[] = $this->config['rolesMap'][$mail];
 			}
